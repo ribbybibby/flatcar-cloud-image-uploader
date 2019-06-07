@@ -128,7 +128,7 @@ bzip2 -d flatcar_production_azure_image.vhd.bz2
 # Upload image to Azure
 azure-vhd-utils upload \
 	--localvhdpath flatcar_production_azure_image.vhd \
-	--stgaccountname $RESOURCE_GROUP \
+	--stgaccountname $STORAGE_ACCOUNT_NAME \
 	--blobname $IMAGE_NAME \
 	--stgaccountkey "$KEY"
 
