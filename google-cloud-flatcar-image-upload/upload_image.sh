@@ -152,5 +152,5 @@ if [[ "$CREATE_IMAGE" = true ]]; then
 	echo "Creating compute image from uploaded image."
 	gcloud compute images create $IMAGE_NAME \
 		--source-uri $BUCKET_IMAGE_PATH \
-		--family flarcar-linux
+		--family flatcar-linux
 fi
