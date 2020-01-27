@@ -5,7 +5,6 @@ set -o pipefail
 # Default values
 FLATCAR_LINUX_CHANNEL=stable
 FLATCAR_LINUX_VERSION=current
-IMAGE_NAME="flatcar-${FLATCAR_LINUX_CHANNEL}"
 ZONE=europe-west3
 FORCE_RECREATE=false
 FORCE_REUPLOAD=false
@@ -83,6 +82,8 @@ case $key in
 	;;
 esac
 done
+
+IMAGE_NAME="${IMAGE_NAME:-flatcar-${FLATCAR_LINUX_CHANNEL}}"
 
 if [[ -z "${BUCKET_NAME}" ]]; then
 	echo "--bucket-name must be specified."

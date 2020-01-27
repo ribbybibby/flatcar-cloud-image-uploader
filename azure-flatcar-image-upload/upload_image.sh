@@ -5,7 +5,6 @@ set -o pipefail
 # Default values
 FLATCAR_LINUX_CHANNEL=stable
 FLATCAR_LINUX_VERSION=current
-IMAGE_NAME="flatcar-${FLATCAR_LINUX_CHANNEL}"
 LOCATION=westeurope
 STORAGE_ACCOUNT_TYPE=Standard_LRS
 
@@ -82,6 +81,8 @@ case $key in
 	;;
 esac
 done
+
+IMAGE_NAME="${IMAGE_NAME:-flatcar-${FLATCAR_LINUX_CHANNEL}}"
 
 if [[ -z "${RESOURCE_GROUP}" ]]; then
 	echo "--resource-group must be specified."
