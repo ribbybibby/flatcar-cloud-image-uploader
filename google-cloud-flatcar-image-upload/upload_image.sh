@@ -15,7 +15,7 @@ Usage: $0 [OPTION...]
 
  Required arguments:
   -b, --bucket-name Name of GCP bucket for storing images.
-  -p, --project-id  ID of the project for creating bucket.
+  -p, --project-id  ID of the project for creating bucket. Not required if --skip-auth is used.
 
  Optional arguments:
   -c, --channel     Flatcar Linux release channel. Defaults to '${FLATCAR_LINUX_CHANNEL}'.
@@ -25,6 +25,7 @@ Usage: $0 [OPTION...]
  Optional flags:
    -f, --force-reupload If used, image will be uploaded even if it already exist in the bucket.
    -F, --force-recreate If user, if compute image already exist, it will be removed and recreated.
+   -s, --skip-auth      Skip the authorization steps.
 HELP_USAGE
 }
 
@@ -74,6 +75,10 @@ case $key in
 		FORCE_RECREATE=true
 		shift
 	;;
+	-s|--skip-auth)
+		SKIP_AUTH=true
+		shift
+	;;
 	*)
 		echo "Unknown parameter $1"
 		echo
@@ -92,19 +97,21 @@ if [[ -z "${BUCKET_NAME}" ]]; then
 	exit 1
 fi
 
-if [[ -z "${PROJECT_ID}" ]]; then
-	echo "--project-id must be specified."
+if [[ "${SKIP_AUTH}" != true ]]; then
+	if [[ -z "${PROJECT_ID}" ]]; then
+		echo "--project-id must be specified."
+		echo
+		usage
+		exit 1
+	fi
+
+	echo "Logging into Google Cloud."
+	gcloud auth login
+
 	echo
-	usage
-	exit 1
+	echo "Setting default project to '$PROJECT_ID'"
+	gcloud config set project $PROJECT_ID
 fi
-
-echo "Logging in into Google Cloud."
-gcloud auth login
-
-echo
-echo "Setting default project to '$PROJECT_ID'"
-gcloud config set project $PROJECT_ID
 
 BUCKET_PATH=gs://$BUCKET_NAME
 echo
