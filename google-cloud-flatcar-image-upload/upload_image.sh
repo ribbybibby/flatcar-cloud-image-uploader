@@ -121,18 +121,22 @@ fi
 IMAGE_FILENAME="flatcar_production_gce.tar.gz"
 IMAGE_URL="https://${FLATCAR_LINUX_CHANNEL}.release.flatcar-linux.net/amd64-usr/${FLATCAR_LINUX_VERSION}/${IMAGE_FILENAME}"
 
-echo
-echo "Downloading Flatcar Linux image from $IMAGE_URL..."
-wget $IMAGE_URL
-
 BUCKET_IMAGE_PATH=$BUCKET_PATH/$IMAGE_FILENAME
-echo
-if [[ "$FORCE_REUPLOAD" = true ]]; then
+UPLOAD_IMAGE=true
+if gsutil -q stat $BUCKET_IMAGE_PATH 2>&1 >/dev/null && [[ "$FORCE_REUPLOAD" != true ]]; then
+	echo
+	echo "Image already exists in bucket, skipping upload. If you want to force reupload, run with --force-reupload."
+	UPLOAD_IMAGE=false
+fi
+
+if [[ "$UPLOAD_IMAGE" = true ]]; then
+	echo
+	echo "Downloading Flatcar Linux image from $IMAGE_URL..."
+	wget $IMAGE_URL
+
+	echo
 	echo "Uploading an image to the bucket."
 	gsutil -o GSUtil:parallel_composite_upload_threshold=150M cp $IMAGE_FILENAME $BUCKET_IMAGE_PATH
-else
-	echo "Uploading an image to the bucket (if image already exist, it won't be uploaded twice. If you want to force reupload, run with --force-reupload."
-	gsutil -o GSUtil:parallel_composite_upload_threshold=150M cp -n $IMAGE_FILENAME $BUCKET_IMAGE_PATH
 fi
 
 CREATE_IMAGE=true
